@@ -3,7 +3,7 @@
 
     ],
     "vsicons.associations.files": [
-        { "icon": "jsmap", "extensions": ["src/assets.ts"], "filename": true },
+        { "icon": "jsmap", "extensions": ["src/_assets.ts", "src/_infos.ts"], "filename": true },
     ],
     "files.associations": {
         "**/nginx/**/*.template": "nginx",

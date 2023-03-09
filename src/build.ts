@@ -21,6 +21,7 @@ const foundAssets = await glob(__assets + '/**/*.*', {
 
 const assets: Record<string, Record<string, Record<string, AssetInfo>>> = {}
 const replaces: string[] = [];
+const allAssets: AssetInfo[] = [];
 
 function substitute(contents: string) {
     const len = replaces.push(contents);
@@ -51,6 +52,7 @@ for (const asset of foundAssets) {
         },
         __proto__: info,
     }
+    allAssets.push(info);
 }
 
 // console.log(inspect(assets, {
@@ -71,10 +73,32 @@ for (const replace of replaces) {
     data = data.replaceAll(expr, replace);
 }
 
+const infos = `
+export type SampleInfos = {
+    type: ${[...new Set(allAssets.map(o => o.type))].map(o => `"${o}"`).join(' | ')},
+    name: ${[...new Set(allAssets.map(o => o.name))].map(o => `"${o}"`).join(' | ')},
+    mime: ${[...new Set(allAssets.map(o => o.mime))].map(o => `"${o}"`).join(' | ')},
+    extension: ${[...new Set(allAssets.map(o => o.extension))].map(o => `"${o}"`).join(' | ')},
+    cdn: ${[...new Set(allAssets.map(o => o.cdn))].map(o => `"${o}"`).join(' | ')},
+    bytes: ${[...new Set(allAssets.map(o => o.bytes))].map(o => `${o}`).join(' | ')},
+}
+`
+
 const __build = __dirname + '/../build';
-await writeFile(__dirname + '/assets.ts', data);
+await writeFile(__dirname + '/_assets.ts', data);
+await writeFile(__dirname + '/_infos.ts', infos);
 await mkdir(__build, { recursive: true });
 
+await copyFile(__dirname + '/_assets.ts', __build + '/_assets.ts');
+await copyFile(__dirname + '/_infos.ts', __build + '/_infos.ts');
 await copyFile(__dirname + '/asset.ts', __build + '/asset.ts');
-await copyFile(__dirname + '/assets.ts', __build + '/assets.ts');
 await copyFile(__dirname + '/index.ts', __build + '/index.ts');
+
+
+/*
+export const infoEnums = {
+    mime: ['video/mp4', 'ye']
+} as const;
+
+type Mimes = (typeof infoEnums['mime'])[number]
+*/

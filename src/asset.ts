@@ -4,11 +4,14 @@ import { pipeline } from 'stream/promises';
 import { get, request } from 'https';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import type { SampleInfos } from './_infos';
 
 
 const ___filename = import.meta.url ? fileURLToPath(import.meta.url) : __filename;
 const __dirname = dirname(___filename);
 
+
+const allAssets: SampleFileAsset<SampleInfos>[] = [];
 
 export type AssetInfo = {
     readonly mime: string;
@@ -20,15 +23,23 @@ export type AssetInfo = {
 }
 
 export class SampleFileAsset<I extends AssetInfo> {
+    /** The MIME type of the file */
     readonly mime: I['mime'];
+    /** The name of the file (without its extension) */
     readonly name: I['name'];
+    /** The type of media (image, video, etc) */
     readonly type: I['type'];
+    /** Filesize */
     readonly bytes: I['bytes'];
+    /** File extension */
     readonly extension: I['extension'];
+    /** Github Raw link (used to download the file) */
     readonly cdn: I['cdn'];
 
     constructor(info: I) {
         Object.assign(this, info);
+        // @ts-ignore
+        allAssets.push(this);
     }
 
 
@@ -59,7 +70,9 @@ export class SampleFileAsset<I extends AssetInfo> {
         return false;
     }
 
-    /** Downloads the file from the CDN */
+    /** Downloads the file from the CDN
+     * - Returns the path to the file
+     */
     async download() {
         const __path = this.__path;
         if (await this.isDownloaded()) {
@@ -103,6 +116,20 @@ export class SampleFileAsset<I extends AssetInfo> {
     get path() {
         return new Promise<string>(async (resolve, reject) => {
             resolve(await this.download())
+        })
+    }
+
+    static filter(info?: ((asset: SampleFileAsset<SampleInfos>) => boolean) | Partial<SampleInfos>) {
+        if (!info) {
+            return [...allAssets]
+        }
+        return allAssets.filter(typeof info === 'function' ? info : o => {
+            for (const key in info) {
+                if (o[key] !== info[key]) {
+                    return false
+                }
+            }
+            return true
         })
     }
 
