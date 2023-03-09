@@ -1,0 +1,34 @@
+{
+    "vsicons.associations.folders": [
+
+    ],
+    "vsicons.associations.files": [
+        { "icon": "jsmap", "extensions": ["src/assets.ts"], "filename": true },
+    ],
+    "files.associations": {
+        "**/nginx/**/*.template": "nginx",
+        "**/nginx/includes/**": "nginx",
+        "**/nginx/sites-enabled/**": "nginx",
+        "**/.env.local": "properties",
+    },
+    "typescript.preferences.importModuleSpecifierEnding": "minimal",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/node_modules": true,
+        "**/package-lock.json": true,
+        "**/next-env.d.ts": true,
+        "**/yarn.lock": true,
+        "**/.next": true,
+        "**/.swc": true,
+        "**/.wireit": true,
+        "**/.turbo": true,
+        // "**/build": true,
+        // "**/dist": true,
+        "**/local-assets": true,
+    },
+}
